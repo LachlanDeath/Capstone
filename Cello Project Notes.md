@@ -27,6 +27,7 @@ For each note played a slider will shows that note quality. Poor to perfect.
 ### Look into different computer vision models. (Lachlan Christian)
 ### Look into real-time audio signal processing models. (Lachlan)
 ### Review real-time audio signal processing. (All)
+### Translate sheet music. (Cohen)
 ## Goals
 - Response from school of music
 - Basic understanding of what makes good bow posture
