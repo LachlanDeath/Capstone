@@ -1,0 +1,39 @@
+# Virtual environments
+mediapipe_env/
+*_env/
+venv/
+.venv/
+
+# Python junk
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Data and models (too big for git)
+data/
+*.mp4
+*.mov
+*.avi
+*.pt
+*.pth
+*.onnx
+*.tflite
+*.task
+*.h5
+
+# Training and experiment output
+runs/
+wandb/
+mlruns/
+logs/
+*.log
+
+# Secrets
+.env
+*.key
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
