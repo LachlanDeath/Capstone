@@ -26,10 +26,12 @@ options = vision.PoseLandmarkerOptions(
 )
 landmarker = vision.PoseLandmarker.create_from_options(options)
 
+TRACKED_HAND = "Right"   # matches the right arm tracked above (subject's perspective)
+
 hand_options = vision.HandLandmarkerOptions(
     base_options=mp_python.BaseOptions(model_asset_path="hand_landmarker.task"),
     running_mode=vision.RunningMode.VIDEO,
-    num_hands=2,
+    num_hands=2,   # detect both so we can pick out the tracked-side hand below
 )
 hand_landmarker = vision.HandLandmarker.create_from_options(hand_options)
 
@@ -67,7 +69,10 @@ while cap.isOpened():
         for p in pts.values():
             cv2.circle(frame, p, 5, (0, 0, 255), -1)
 
-    for hand in hand_result.hand_landmarks:
+    for hand, handedness in zip(hand_result.hand_landmarks, hand_result.handedness):
+        if handedness[0].category_name != TRACKED_HAND:
+            continue
+
         hand_pts = [(int(p.x * w), int(p.y * h)) for p in hand]
 
         for a, b in HAND_CONNECTIONS:
