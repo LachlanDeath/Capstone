@@ -6,9 +6,9 @@ from mediapipe.tasks.python import vision
 
 # Upper-body landmark indices and the lines between them
 # 0 nose, 11/12 shoulders, 13/14 elbows, 15/16 wrists, 23/24 hips
-CONNECTIONS = [(11, 12), (11, 13), (13, 15), (12, 14), (14, 16),
-               (11, 23), (12, 24), (23, 24)]
-KEYPOINTS = [0, 11, 13, 15]
+
+KEYPOINTS = [11, 13, 15]                      # drop nose if you don't need it
+CONNECTIONS = [(11, 13), (13, 15)]            # shoulder→elbow, elbow→wrist
 
 options = vision.PoseLandmarkerOptions(
     base_options=mp_python.BaseOptions(model_asset_path="pose_landmarker_lite.task"),
