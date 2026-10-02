@@ -58,7 +58,7 @@ pip install -r requirements.txt
 ### 5. Move into the `mediapipe` directory
 
 ```bash
-cd video/mediapipe
+cd code/video/mediapipe
 ```
 
 ### 6. Download the pose and hand models
