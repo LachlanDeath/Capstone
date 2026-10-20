@@ -22,7 +22,7 @@ HAND_CONNECTIONS = [
 
 options = vision.PoseLandmarkerOptions(
     base_options=mp_python.BaseOptions(model_asset_path="pose_landmarker_lite.task"),
-    running_mode=vision.RunningMode.VIDEO,
+    running_mode=vision.RunningMode.VIDEA
 )
 landmarker = vision.PoseLandmarker.create_from_options(options)
 

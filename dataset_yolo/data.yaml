@@ -1,0 +1,7 @@
+path: C:/Users/maxsl/Capstone/dataset_yolo
+train: images/train
+val: images/val
+kpt_shape: [4, 3]
+flip_idx: [0, 1, 2, 3]
+names:
+  0: cello
