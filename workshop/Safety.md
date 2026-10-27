@@ -6,3 +6,6 @@
 **Eye safety**
 - ensure the that the GUI is easy to see and not visually strenuous. 
 - monitor the amount of time the user has been playing and encourage breaks if the user has exceeded a health amount of time. 
+
+**Posture safety**
+- good luck explaining this one. 
