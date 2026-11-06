@@ -1,27 +1,33 @@
-## Notes
-### Need for the proposal 
-#### Display
-- See what actual cello players like.
+# Week 5 - Meeting
+---
 
-#### Audio
-- Transparent sheet music.
-- Look into Yeti silver mic.
-- Provide visual in time feed back regarding the audio. 
+## Required for the project proposal
 
-#### Video
-- USB connected webcam.
+### Display
+- Research what actual cello players want from the display.
+- Design an optimal Graphical User Interface (GUI) for user interaction
 
-#### Data collection ethic 
-- Forms submitted and approved.
+### Audio
+-  Use a transparent sheet music display.
+- Research and select a microphone (Silver Yeti microphone)
+- Provide visual feedback on the audio, in time with the performance.
 
-### Project proposal (looking for)
-#### Problem statement 
-- Causes.
-- What is the solution (Zoomed out version).
-- What you want the system to provide.
+### Video
+- Research and select a USB-connected webcam.
 
-#### Sub systems
-- Cost 
-- Challenges 
-- Software decision
+### Data Collection Ethics
+- Research what types of ethics applications must be submitted and approved before any data collection occurs.
+
+### Problem Statement
+- Describe the underlying causes of the problem.
+- Give a higher-level, but justified overview of the proposed solution.
+- State the goals of what each subsystem should provide to the collective system, and to the project overall. 
+
+### Defined Subsystems
+- Estimate the costs for each subsystem.
+- Identify the expected challenges.Select and justify which software applications will be implemented
+
+
+
+#
 
