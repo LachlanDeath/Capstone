@@ -1,8 +1,13 @@
 # General Research Ethics Board (GREB)
+Queen’s University General Research Ethics Board (GREB) is the authority to review any proposed research involving human participants that is conducted under the auspices of Queen's University. GREB primarily has human ethics authority over humanities, social science, science, engineering, and administrative research involving humans.
+
+When submitting to GREB, researchers are expected to provide clear and comprehensive documentation, demonstrating a thorough understanding of ethical considerations. The submission process, marked by transparency and collaboration, reflects Queen’s commitment to responsible and ethical research practices.
+
 **Submission Deadline:** December 16, 2026 
 **Meeting Date:** January 6, 2027
 *(This is the schedule for higher-risk applications. We should confirm if our project is low-risk)*
 
+**Project Outline:**
 * The part of this project that warrants an application to the General Research Ethics Board, is the collection and use of data (images, videos) containing humans, apart of this study. 
 * These participants need to be consenting, and in both understanding and agreement to all the outlined terms of use for the images and pictures containing them. 
 * These participants will be between the ages of XX-XX, and defined as a beginner, intermediate, or expert cellist. 
