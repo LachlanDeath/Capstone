@@ -1,6 +1,6 @@
-# MusicXML Test Program (`test.py`)
+# MusicXML Test Program (`build_musicXML.py`)
 
-Here's what each part of `test.py` does, from top to bottom.
+Here's what each part of `build_musicXML.py` does, from top to bottom.
 
 ## Constants
 

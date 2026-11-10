@@ -1,4 +1,4 @@
-"""Simple MusicXML test: write a C major scale to a .musicxml file, then parse it back."""
+"""Build a C major scale and write it to a .musicxml file."""
 
 import xml.etree.ElementTree as ET
 
@@ -45,38 +45,14 @@ def build_score(notes):
     return ET.ElementTree(score)
 
 
-def write_score(tree, path):
+if __name__ == "__main__":
+    tree = build_score(SCALE)
     ET.indent(tree, space="  ")
-    with open(path, "wb") as f:
+    with open(OUTPUT_FILE, "wb") as f:
         f.write(b'<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
         f.write(
             b'<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" '
             b'"http://www.musicxml.org/dtds/partwise.dtd">\n'
         )
         tree.write(f, encoding="utf-8", xml_declaration=False)
-
-
-def read_notes(path):
-    root = ET.parse(path).getroot()
-    notes = []
-    for note in root.iter("note"):
-        pitch = note.find("pitch")
-        notes.append((pitch.findtext("step"), int(pitch.findtext("octave"))))
-    return notes
-
-
-def note_to_freq(step, octave):
-    semitones = {"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11}
-    midi = 12 * (octave + 1) + semitones[step]
-    return 440.0 * 2 ** ((midi - 69) / 12)
-
-
-if __name__ == "__main__":
-    write_score(build_score(SCALE), OUTPUT_FILE)
     print(f"Wrote {OUTPUT_FILE}")
-
-    parsed = read_notes(OUTPUT_FILE)
-    assert parsed == SCALE, f"Round-trip mismatch: {parsed}"
-    print("Round-trip OK. Notes and expected frequencies:")
-    for step, octave in parsed:
-        print(f"  {step}{octave}: {note_to_freq(step, octave):7.2f} Hz")
