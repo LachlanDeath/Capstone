@@ -1,8 +1,7 @@
-## Explain the portfolio. 
-(Lachlan Death).
+## Pitch Detection 
+(Cohen Little).
 
-Explain (each folder).
-Explain (how to read). 
+Implementing the pitch detection via YIN within the code directory. 
 
 
 
