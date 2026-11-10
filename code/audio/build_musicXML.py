@@ -1,8 +1,9 @@
 """Build a C major scale and write it to a .musicxml file."""
 
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
-OUTPUT_FILE = "test_scale.musicxml"
+OUTPUT_FILE = Path(__file__).resolve().parent / "test_scale.musicxml"
 
 # (step, octave) for one octave of C major, each a quarter note
 SCALE = [("C", 4), ("D", 4), ("E", 4), ("F", 4), ("G", 4), ("A", 4), ("B", 4), ("C", 5)]
