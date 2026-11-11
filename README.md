@@ -1,4 +1,4 @@
-# Cello Feedback System
+## A Visual and Audio Processing System for Real-Time Cello Posture and Performance Feedback
 
 **MREN 403 Capstone** · Lachlan Death, Cohen Little, Max Sloan, Christian Vandermeer
 
