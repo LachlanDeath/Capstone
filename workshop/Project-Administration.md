@@ -1,3 +1,6 @@
+* This is the estimated recorded hours for each team member throughout the project. 
+* This record is updated as of September 7th (Week 1) - November 12th (Week 9)
+
 | Week | Lachlan Death | Cohen Little | Max Sloan | Christian Vandermeer |
 |---|---|---|---|---|
 | Week 1 | <ol><li>No work logged</li><li><b>Total: 0 hrs</b></li></ol> | <ol><li>No work logged</li><li><b>Total: 0 hrs</b></li></ol> | <ol><li>No work logged</li><li><b>Total: 0 hrs</b></li></ol> | <ol><li>2 hrs — Project selection and brainstorming</li><li>1 hr — Meeting with Keyvan</li><li><b>Total: 3 hrs</b></li></ol> |
