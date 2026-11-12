@@ -1,56 +1,101 @@
-# Engineering Portfolio: Cello Posture Tutor
+# Cello Posture Tutor
 
-## Video processing summary
+This portfolio prototype uses a webcam to compare a cellist's visible upper-body posture with a reference pose. It overlays the target as a cyan "ghost" and gives simple screen-direction hints when detected elbows, wrists, or the cello scroll are far from the target. MediaPipe estimates the body pose locally; optional cello and bow keypoints come from a Roboflow workflow.
 
-The Cello Posture Tutor is a computer-vision prototype that gives a cello player a visual reference while they practise.
-
-## Logic - code/video/prototypes/cello_tutor_1
-
-1. The tutor opens the computer's default webcam
-2. MediaPipe's Pose Landmarker estimates the player's nose, ears, shoulders, elbows, and wrists
-3. When cello tracking is enabled, a background worker sends a resized camera frame to the Roboflow workflow. The response provides keypoints, currently the cello scroll, bridge, and bow tip. The workflow's image coordinates are scaled back to the webcam frame.
-4. The target posture—which was established by running the model on an experienced cellist to extract reference keypoints—is anchored at the player's ears and scaled. It is mirrored when needed.
-5. The program draws the target posture, detected body skeleton of player (detected posture), and available cello/bow points (cello posture). It compares elbows, wrists, and the scroll with the target and shows hints when their difference exceeds a threshold.
-6. In the interactive window, **G** toggles the target overlay and **Q** exits.
-
-## Map
+## What is in this submission
 
 | Path | Purpose |
 | --- | --- |
-| `code/video/prototypes/cello_tutor_1.py` | Main live tutor prototype: webcam loop, MediaPipe pose, optional cello tracking, target overlay, and hints. |
-| `code/video/prototypes/cello_tutor_1_session.py` | Session-recording version. Saves annotated video and frame-by-frame CSV under `code/video/prototypes/recordings/`. |
-| `code/video/roboflow_workflow.py` | Roboflow HTTP client, API-key lookup, retry/error handling, and keypoint parser. |
-| `code/video/tools/pose_cello_image.py` | Single-image body, hand, cello, and bow landmarking tool. |
-| `code/video/tools/capture_images.py` | Webcam image-capture utility. |
-| `code/video/main.py` | Minimal MediaPipe import/version check; not the tutor entry point. |
-| `code/video/tools/archive tools/` | Archived pose, guitar, and diagnostic prototypes. |
-| `dataset/labels.json` | Tracked cello/bow keypoint labels. The image files are not tracked in the current 1.2 branch. |
-| `README.md` | Older setup notes; some commands refer to the previous folder layout. |
-| `requirements.txt` | Python dependency pins. |
-| `.gitignore` | Excludes virtual environments, local model assets, videos, and generated files. |
+| `video/code/prototypes/cello_tutor_1.py` | **Live tutor entry point.** Opens the webcam, draws the body pose and target, and optionally tracks cello/bow points. |
+| `video/code/prototypes/cello_tutor_1_session.py` | Recording version of the live tutor. Saves the annotated session video and a per-frame CSV log. |
+| `video/code/tools/capture_images.py` | Captures still webcam frames for the dataset. |
+| `video/code/tools/pose_cello_image.py` | Adds body, hand, cello, and bow landmarks to one selected image. |
+| `video/code/roboflow_workflow.py` | Sends an image to Roboflow and parses its cello/bow keypoints; also has an offline parser self-test. |
+| `video/code/main.py` | **Not the tutor.** Only imports MediaPipe and prints its version as a minimal installation check. |
+| `video/code/pose_landmarker_lite.task`, `video/code/hand_landmarker.task` | MediaPipe model assets. They are ignored by Git and must be downloaded from Gdrive/code for code to work. |
+| `video/dataset/` | Dataset material, including `MaxRoom1/raw/`, `Youtube/`, and `labels.json` with image keypoint labels. |
+| `requirements.txt` (repository root) | Pinned Python dependencies for this project. |
+| `.gitignore` | Repository-root rules that exclude local model assets (`*.task`), virtual environments, secrets, and generated video files. |
+| `video/MEDIAPIPE_SETUP.md` | Earlier MediaPipe setup notes. Its example paths are from the previous layout; use the commands in this README for this submission. |
 
-## Main implementation details
+## Setup (Windows PowerShell)
 
-### Body pose and target alignment
+Run these commands from the repository root. Python 3.11 or 3.12 is recommended by the setup notes.
 
-The tutor uses MediaPipe's upper-body landmark indices for the nose, ears, shoulders, elbows, and wrists. The ear midpoint provides an anchor shared by the reference and live player; face width provides a scale factor so the reference changes size with the player in frame. A side swap handles mirrored views and different bow sides. Exponential smoothing is applied to scale and anchor between frames. If the ears cannot be detected, the ghost and its hints are withheld rather than aligning an unreliable target.
+```powershell
+python --version
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r .\requirements.txt
+Set-Location .\video\code
+Invoke-WebRequest -Uri "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task" -OutFile .\pose_landmarker_lite.task
+Invoke-WebRequest -Uri "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task" -OutFile .\hand_landmarker.task
+Set-Location ..\..
+```
 
-### Cello/bow detection and data flow
+The `.task` files are local downloads, not submitted/tracked files. If PowerShell blocks virtual-environment activation, allow it for this terminal only, then activate again:
 
-`roboflow_workflow.py` reads `ROBOFLOW_API_KEY` from the process environment rather than storing credentials in source. It JPEG-encodes each BGR frame, sends it to the workflow over HTTPS, and normalizes the workflow response into named keypoints with confidence values and image dimensions. The tutor filters low-confidence keypoints, converts them back to the original frame size, and draws the scroll-to-bridge line and bow-tip connection when enough points are available.
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
+```
 
-The live tutor caps inference at five requests per second and 3,000 requests per run. Each request uses Roboflow credits and sends an image outside the computer to the service, so cello tracking requires network access, workflow access, and a valid key.
+Cello/bow detection requires a Roboflow API key with access to the configured workflow. Set it in the current PowerShell session; do not put a real key in source code or commit it:
 
-## Misc
+```powershell
+$env:ROBOFLOW_API_KEY = "paste-your-key-here"
+```
 
-For recording, use `cello_tutor_1_session.py` in place of `cello_tutor_1.py`. For a still image, run `python mediapipe\code\tools\pose_cello_image.py path\to\photo.jpg`; it requires the hand model and Roboflow key as well as the pose model. A custom reference can be created with `python mediapipe\code\prototypes\cello_tutor_1.py --make-reference path\to\reference.jpg --bow-side left`.
+The default tutor sends camera frames to Roboflow for cello/bow inference, at up to five requests per second and 3,000 requests per run. That service requires internet access, and each inference consumes account credits. The body pose runs locally. To use the tutor without cloud cello tracking or an API key, add `--no-cello`.
 
-## Current scope and limitations
+## Run the tools
 
-- The tutor compares a 2D camera view with a single reference pose; it does not reconstruct 3D motion or account for every valid variation in body shape, cello setup, or playing technique.
-- The reference is anchored and scaled using the face or shoulders, not calibrated using camera geometry. Occlusion, lighting, camera placement, motion blur, and mirrored orientation can reduce landmark quality.
-- Cello and bow detection is a separate cloud inference path. It may be delayed or unavailable when the network, API key, workflow, or confidence threshold prevents a usable result.
-- There is no pitch/note recognition, sheet-music alignment, sound-quality feedback, user account, graphical setup flow, or haptic output in the current implementation.
-- The repository includes data, labels, and YOLO experiment results, but the live tutor does not train a model at startup and does not use a local YOLO weights file.
+From the repository root, start the **live tutor**:
 
-The intended next product step is to validate the visual feedback with cello teachers and students, then decide which additions (for example audio feedback) are supported by evidence and fit the project scope.
+```powershell
+python .\video\code\prototypes\cello_tutor_1.py
+```
+
+Press **G** to show/hide the target overlay and **Q** to quit. The webcam view is mirrored. Both ears must be visible to align the target. For body-only tracking, run `python .\video\code\prototypes\cello_tutor_1.py --no-cello`.
+
+To record a session instead, run:
+
+```powershell
+python .\video\code\prototypes\cello_tutor_1_session.py
+```
+
+Recording starts automatically. Press **G** to toggle the target and **Q** to stop and save. An MP4 and per-frame CSV are written to `video/code/prototypes/recordings/` with timestamped names. The session stops after 10 minutes; if the video encoder cannot open, the script reports that no video was recorded, while the CSV log is still written.
+
+To create a custom reference pose from a clear photo (with both ears visible), use:
+
+```powershell
+python .\video\code\prototypes\cello_tutor_1.py --make-reference "C:\path\to\reference.jpg" --bow-side left
+```
+
+The generated `reference_posture.json` is saved beside the script and loaded automatically on the next run. `--bow-side` describes which side of the photo shows the reference player's bow hand. Creating it requires a Roboflow key for cello/bow points.
+
+For **webcam image capture**, change to `video` first so the script saves into the submitted dataset folder:
+
+```powershell
+Set-Location .\video
+python .\code\tools\capture_images.py
+```
+
+Press **Space** to save one unmirrored frame, **R** to toggle automatic capture (one image every 0.5 seconds), and **Q** to quit. New numbered JPGs go into `video/dataset/raw/`.
+
+For a **single-image landmarking** run, provide the image path from the repository root:
+
+```powershell
+python .\video\code\tools\pose_cello_image.py "C:\path\to\photo.jpg"
+```
+
+The tool also opens a file picker when no path is supplied. It saves `<image-name>_landmarked.jpg` next to the source image and displays a preview; press any key to close it. It requires both MediaPipe models and a Roboflow key (one cloud inference per image).
+
+To check the workflow response parser without a key, webcam, or network request:
+
+```powershell
+python .\video\code\roboflow_workflow.py --selftest
+```
+
+## Scope and caveats
+
+The overlay aligns a 2D reference to the player's face and scales it; it is not 3D motion analysis or a complete measure of cello technique. Landmark quality depends on camera angle, lighting, visibility, and movement. Roboflow detection can be delayed or unavailable, and its image inference uses network access and credits. The current prototype does not provide audio/pitch feedback, sheet-music alignment, user accounts, or a setup interface.
