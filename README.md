@@ -12,7 +12,7 @@ A real-time feedback system for cello students. It combines two subsystems and s
 
 This repository holds the code used to develop, test and run the cello tutor. It is split into two directories, `audio/` and `video/`. The subsystems are still in development and are not yet integrated. To run either one, see the README inside its folder.
 
-There are currently two main development branches: `pitch-detection` and `mediapipe-baseline`. Because they are under active development, they may contain incomplete code, depend on an editor's local files, or lack documentation. You're welcome to look through them, but only expect code explicitly marked as complete to run. all code in the main directory if functional and if you follow the dedicated READMEs in both directories you will be able to run the code. 
+There are currently two main development branches: `pitch-detection` and `wip/cello-posture-tutor-1.2-current`. Because they are under active development, they may contain incomplete code, depend on an editor's local files, or lack documentation. You're welcome to look through them, but only expect code explicitly marked as complete to run. all code in the main directory if functional and if you follow the dedicated READMEs in both directories you will be able to run the code. 
 
 All non-code work is kept in the project Google Drive: **https://drive.google.com/drive/folders/1mII-Jv8q8QVNS6psOojhaKh2EvGQKYGC?usp=drive_link**
 
