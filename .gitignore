@@ -3,6 +3,7 @@ mediapipe_env/
 *_env/
 venv/
 .venv/
+.venv312/
 
 # Python junk
 __pycache__/
