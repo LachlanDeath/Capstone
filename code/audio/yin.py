@@ -74,7 +74,7 @@ def _analyse(x, start, W, tau_min, tau_max, threshold):
     return period, cmnd[tau]
 
 
-def yin(buffer, fs, fmin=60.0, fmax=1100.0, threshold=0.4, window_s=0.060):
+def yin(buffer, fs, fmin=60.0, fmax=1100.0, threshold=0.4, window_s=0.0):
     """Return the pitch of `buffer` in Hz, or None if no clear pitch.
 
     `window_s` is the integration window length in seconds (the paper uses 25 ms).
