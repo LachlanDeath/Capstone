@@ -16,7 +16,7 @@ This portfolio prototype uses a webcam to compare a cellist's visible upper-body
 | `video/dataset/` | Dataset material, including `MaxRoom1/raw/`, `Youtube/`, and `labels.json` with image keypoint labels. |
 | `requirements.txt` (repository root) | Pinned Python dependencies for this project. |
 | `.gitignore` | Repository-root rules that exclude local model assets (`*.task`), virtual environments, secrets, and generated video files. |
-| `video/MEDIAPIPE_SETUP.md` | Earlier MediaPipe setup notes. Its example paths are from the previous layout; use the commands in this README for this submission. |
+| `video/MEDIAPIPE_SETUP.md` | Earlier MediaPipe setup notes. Its example paths are from the previous layout; use the commands in this README to run all functions. |
 
 ## Setup (Windows PowerShell)
 
