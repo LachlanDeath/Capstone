@@ -21,4 +21,5 @@ All non-code work is kept in the project Google Drive: **https://drive.google.co
 1. **Project proposal:** in the `deliverables` folder. Start here.
 2. **Design documents:** the `design_documents` folder holds the calculations behind our design decisions, plus flowcharts of the two subsystems.
 3. **Results:** the `results` folder holds the test results so far and is a good marker of progress.
-4. **draw.io:** is a recommended tool used to view and edit the flowcharts in the `design_documents` folder. It can be installed through the Google Workspace Marketplace. These flowcharts are used to update our current system designs.
+
+**draw.io tool note:** draw.io is a recommended tool used to view and edit the flowcharts in the `design_documents` folder. It can be installed through the Google Workspace Marketplace. These flowcharts are used to update our current system designs.
