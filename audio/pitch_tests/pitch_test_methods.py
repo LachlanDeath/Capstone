@@ -36,7 +36,7 @@ def pitch_diff(x, fs, fmax=1000, W=W, tau_max=TAU_MAX):
     d = diff_fn(x, W, tau_max)
     return fs / (tau_min + np.argmin(d[tau_min:]))
 
-def pitch_diff_mod(x, fs, fmax=1000, margin=1.0, W=W, tau_max=TAU_MAX):
+def pitch_diff_mod(x, fs, fmax=1000, margin=0.1, W=W, tau_max=TAU_MAX):
     assert len(x) >= W + tau_max, f"need {W + tau_max} samples, got {len(x)}"
     tau_min = int(fs / fmax)
     d = diff_fn(x, W, tau_max)
@@ -46,6 +46,19 @@ def pitch_diff_mod(x, fs, fmax=1000, margin=1.0, W=W, tau_max=TAU_MAX):
         if d[tau] < best_val - margin:        # lower than the last min by at least margin
             best_tau, best_val = tau, d[tau]
     return fs / best_tau
+
+def cmndf(d):
+    """Step 3: d'(tau) = d(tau) / mean(d[1..tau]),  d'(0) = 1"""
+    dp = np.ones_like(d)
+    dp[1:] = d[1:] * np.arange(1, len(d)) / np.cumsum(d[1:])
+    return dp
+
+
+def pitch_cmndf(x, fs, fmax=1000, W=W, tau_max=TAU_MAX):
+    assert len(x) >= W + tau_max, f"need {W + tau_max} samples, got {len(x)}"
+    tau_min = int(fs / fmax)                       # now only sets the highest pitch
+    dp = cmndf(diff_fn(x, W, tau_max))
+    return fs / (tau_min + np.argmin(dp[tau_min:]))
 
 
 if __name__ == "__main__":

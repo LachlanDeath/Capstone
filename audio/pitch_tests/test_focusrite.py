@@ -1,7 +1,7 @@
 import numpy as np
 import sounddevice as sd
 import matplotlib.pyplot as plt    
-from yin_test import pitch_diff, pitch_diff_mod, FRAME       
+from pitch_test_methods import pitch_diff, pitch_diff_mod, FRAME       
 from voicing_gate import power    
 
 fs, hop, window = 48000, 480, FRAME
