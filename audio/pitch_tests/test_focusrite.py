@@ -2,7 +2,6 @@ import numpy as np
 import sounddevice as sd
 import matplotlib.pyplot as plt    
 from pitch_test_methods import pitch_diff, pitch_diff_mod, FRAME       
-from voicing_gate import power    
 
 fs, hop, window = 48000, 480, FRAME
 shelf = np.zeros(hop, dtype=np.float32)
@@ -27,8 +26,6 @@ with sd.InputStream(device="Scarlett", samplerate=48000, channels=1, blocksize=4
         line.set_ydata(buffer)                      
         plt.pause(0.01)  
 
-
-        p = power(buffer)
         f0 = pitch_diff(buffer, fs) if p > 5e-3 else None
         f1 = pitch_diff_mod(buffer, fs) if p > 5e-3 else None
         if f0 is not None:

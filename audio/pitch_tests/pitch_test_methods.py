@@ -60,6 +60,116 @@ def pitch_cmndf(x, fs, fmax=1000, W=W, tau_max=TAU_MAX):
     dp = cmndf(diff_fn(x, W, tau_max))
     return fs / (tau_min + np.argmin(dp[tau_min:]))
 
+def pitch_threshold(x, fs, fmax=1000, threshold=0.1, W=W, tau_max=TAU_MAX):
+    assert len(x) >= W + tau_max, f"need {W + tau_max} samples, got {len(x)}"
+    tau_min = int(fs / fmax)
+    dp = cmndf(diff_fn(x, W, tau_max))
+
+    for tau in range(tau_min, tau_max):
+        if dp[tau] < threshold:                                  # first dip below threshold
+            while tau + 1 <= tau_max and dp[tau + 1] < dp[tau]:  # slide to its bottom
+                tau += 1
+            return fs / tau
+    return fs / (tau_min + np.argmin(dp[tau_min:]))              # none found: global min
+
+def parabolic(d, tau):
+    """Step 5: fit a parabola through d[tau-1], d[tau], d[tau+1]; return its minimum."""
+    if tau <= 0 or tau >= len(d) - 1:
+        return float(tau)                          # no neighbours on one side
+    a, b, c = d[tau - 1], d[tau], d[tau + 1]
+    den = a - 2 * b + c
+    return tau + (a - c) / (2 * den) if den != 0 else float(tau)
+
+
+def pitch_parabolic(x, fs, fmax=1000, threshold=0.0, W=W, tau_max=TAU_MAX):
+    assert len(x) >= W + tau_max, f"need {W + tau_max} samples, got {len(x)}"
+    tau_min = int(fs / fmax)
+    d = diff_fn(x, W, tau_max)
+    dp = cmndf(d)
+
+    tau = None
+    for t in range(tau_min, tau_max):                            # step 4: pick the dip
+        if dp[t] < threshold:
+            while t + 1 <= tau_max and dp[t + 1] < dp[t]:
+                t += 1
+            tau = t
+            break
+    if tau is None:
+        tau = tau_min + np.argmin(dp[tau_min:])
+
+    return fs / parabolic(d, tau)                                # step 5: refine on raw d
+
+
+def pitch_local(x, fs, history, fmin, fmax, threshold, n_back,
+                W=W, tau_max=TAU_MAX):
+    assert len(x) >= W + tau_max, f"need {W + tau_max} samples, got {len(x)}"
+    tau_min = int(fs / fmax)
+    tau_hi = min(tau_max, int(fs / fmin))
+    d = diff_fn(x, W, tau_max)
+    dp = cmndf(d)
+
+    tau = None                                                   # step 4
+    for t in range(tau_min, tau_hi):
+        if dp[t] < threshold:
+            while t + 1 <= tau_hi and dp[t + 1] < dp[t]:
+                t += 1
+            tau = t
+            break
+    if tau is None:
+        tau = tau_min + np.argmin(dp[tau_min:tau_hi + 1])
+
+    # step 6 (look-back): if a recent frame was more confident, search near its period
+    if history:
+        best_tau, best_conf = min(history, key=lambda h: h[1])
+        if best_conf < dp[tau]:
+            lo = max(tau_min, int(best_tau * 0.8))
+            hi = min(tau_hi, int(best_tau * 1.2))
+            tau = lo + np.argmin(dp[lo:hi + 1])
+
+    history.append((tau, dp[tau]))                               # remember this frame
+    del history[:-n_back]                                        # keep only the last n_back
+
+    return fs / parabolic(d, tau)                                # step 5
+
+
+def track_pitch(x, fs, hop=480, frame=FRAME, mode="yin", fmin=50, fmax=200, threshold=0.1, n_back=5):
+    """Slide a frame along x by hop samples. Returns (times, freqs); freqs is NaN where silent."""
+    starts = range(0, len(x) - frame + 1, hop)
+    times, freqs = [], []
+    history = []
+    if fmin <= 0 or fmax <= 0 or fmin >= fmax:
+        raise ValueError(f"invalid fmin/fmax: {fmin}/{fmax}")
+    for s in starts:
+        chunk = x[s:s + frame]
+
+        if mode == "parabolic":
+            f0 = pitch_parabolic(chunk, fs, fmax=fmax)
+        elif mode == "yin":
+            f0 = pitch_local(chunk, fs, history, fmin=fmin, fmax=fmax, threshold=threshold, n_back=n_back)
+        elif mode == "diff":
+            f0 = pitch_diff(chunk, fs, fmax=fmax)
+        elif mode == "diff_mod":
+            f0 = pitch_diff_mod(chunk, fs, fmax=fmax)
+        elif mode == "cmndf":
+            f0 = pitch_cmndf(chunk, fs, fmax=fmax)
+        else:
+            raise ValueError(f"unknown mode {mode}")
+
+        if f0 > fmax:
+            f0 = fmax
+        if f0 < fmin:
+            f0 = fmin
+
+        times.append((s + frame) / fs)   # time of the newest sample in the frame
+        freqs.append(f0)
+
+    print(f"mode {mode}: fmin {fmin} Hz, fmax {fmax} Hz")
+    print(f"threshold {threshold}") if mode == "yin" or mode == "parabolic" else None
+    print(f"n_back {n_back}") if mode == "yin" else None
+
+    return np.array(times), np.array(freqs)
+
+
 
 if __name__ == "__main__":
     fs, f0 = 48000, 220.0
