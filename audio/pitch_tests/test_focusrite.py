@@ -26,8 +26,8 @@ with sd.InputStream(device="Scarlett", samplerate=48000, channels=1, blocksize=4
         line.set_ydata(buffer)                      
         plt.pause(0.01)  
 
-        f0 = pitch_diff(buffer, fs) if p > 5e-3 else None
-        f1 = pitch_diff_mod(buffer, fs) if p > 5e-3 else None
+        f0 = pitch_diff(buffer, fs)
+        f1 = pitch_diff_mod(buffer, fs) 
         if f0 is not None:
-            print(f"{f0:.1f} Hz diff_mod: {f1:.1f} Hz, (power {p:.2e})")
+            print(f"{f0:.1f} Hz diff_mod: {f1:.1f} Hz")
                        
