@@ -11,6 +11,7 @@ __pycache__/
 
 # Data and models (too big for git)
 data/
+plots/
 *.mp4
 *.mov
 *.avi
