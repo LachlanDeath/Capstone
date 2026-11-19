@@ -6,6 +6,7 @@ so each frame must hold W + tau_max samples.
     lowest detectable f0 = fs / tau_max = 46.9 Hz
 """
 import numpy as np
+from voicing_gate import is_silent
  
 W = 1024        # YIN integration window (samples)
 TAU_MAX = 1024    # largest lag (samples) -> lowest f0
@@ -100,9 +101,13 @@ def pitch_parabolic(x, fs, fmax=1000, threshold=0.0, W=W, tau_max=TAU_MAX):
     return fs / parabolic(d, tau)                                # step 5: refine on raw d
 
 
-def pitch_local(x, fs, history, fmin, fmax, threshold, n_back,
-                W=W, tau_max=TAU_MAX):
+def pitch_local(x, fs, history, hop=480, fmin=50, fmax=200, threshold=0.1, n_back=5, W=W, tau_max=TAU_MAX, silence_db=-20):
     assert len(x) >= W + tau_max, f"need {W + tau_max} samples, got {len(x)}"
+
+    if is_silent(x[-hop:], silence_db):          # silence gate: check the newest hop first
+        history.clear()                          # don't carry the old note into the next one
+        return None
+
     tau_min = int(fs / fmax)
     tau_hi = min(tau_max, int(fs / fmin))
     d = diff_fn(x, W, tau_max)
@@ -132,7 +137,7 @@ def pitch_local(x, fs, history, fmin, fmax, threshold, n_back,
     return fs / parabolic(d, tau)                                # step 5
 
 
-def track_pitch(x, fs, hop=480, frame=FRAME, mode="yin", fmin=50, fmax=200, threshold=0.1, n_back=5):
+def track_pitch(x, fs, hop=480, frame=FRAME, mode="yin", fmin=50, fmax=1000, threshold=0.1, n_back=5,silence_db=-20):
     """Slide a frame along x by hop samples. Returns (times, freqs); freqs is NaN where silent."""
     starts = range(0, len(x) - frame + 1, hop)
     times, freqs = [], []
@@ -145,7 +150,7 @@ def track_pitch(x, fs, hop=480, frame=FRAME, mode="yin", fmin=50, fmax=200, thre
         if mode == "parabolic":
             f0 = pitch_parabolic(chunk, fs, fmax=fmax)
         elif mode == "yin":
-            f0 = pitch_local(chunk, fs, history, fmin=fmin, fmax=fmax, threshold=threshold, n_back=n_back)
+            f0 = pitch_local(chunk, fs, history=history, hop=hop, fmin=fmin, fmax=fmax, threshold=threshold, n_back=n_back, silence_db=silence_db)
         elif mode == "diff":
             f0 = pitch_diff(chunk, fs, fmax=fmax)
         elif mode == "diff_mod":
@@ -154,11 +159,9 @@ def track_pitch(x, fs, hop=480, frame=FRAME, mode="yin", fmin=50, fmax=200, thre
             f0 = pitch_cmndf(chunk, fs, fmax=fmax)
         else:
             raise ValueError(f"unknown mode {mode}")
-
-        if f0 > fmax:
-            f0 = fmax
-        if f0 < fmin:
-            f0 = fmin
+        
+        if f0 is None or not (fmin <= f0 <= fmax):
+            f0 = np.nan
 
         times.append((s + frame) / fs)   # time of the newest sample in the frame
         freqs.append(f0)
