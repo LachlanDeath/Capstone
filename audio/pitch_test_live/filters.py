@@ -24,3 +24,4 @@ def stability_gate(freqs, n=5, max_dev_cents=30):
         if np.std(cents) > max_dev_cents:
             out[k] = np.nan
     return out
+

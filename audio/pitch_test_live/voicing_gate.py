@@ -14,3 +14,6 @@ def loudness_db(x):
 def is_silent(x, threshold_db=-50):
     """True if the window is quieter than threshold_db (aubio's default is -50 dB)."""
     return loudness_db(x) < threshold_db
+
+
+    
